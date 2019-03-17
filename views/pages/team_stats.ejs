@@ -26,7 +26,26 @@
 						that ran onload for Lab 5.  We are doing the same kind of operations we had in Lab 5, but we are instead having
 						everything handled via server-side scriptes
 			-->
-			
+
+			<%
+			if (data){
+                //console.log(data)
+                var entries = ''
+			    data.forEach(function (item) {
+                    entries += '<tr><td>' + item.game_date + '</td><td>' +
+                            item.visitor_name + '</td><td>' + item.home_score + '</td><td>' + item.visitor_score + '</td>'
+                    if(item.home_score < item.visitor_score){
+                        //visitor wins
+                        entries += '<td>' + item.visitor_name + '</td>'
+                    }
+                    else if (item.home_score > item.visitor_score){
+                        //home team wins
+                        entries += '<td>Colorado</td>'
+                    }
+
+                }) %>
+            <%- entries%>
+            <%} %>
 		</table>
 		<br>
 		<table class="table text-center">
@@ -35,10 +54,29 @@
 				<th>Losses</th>
 			</tr>
 			<tr>
-				<td> <!-- TODO: Display the total number of wins here.  
-							    This value should come from your server.js files query, don't calculate it in this file! --></td>
-				<td> <!-- TODO: Display the total number of losses here.  
-							    This value should come from your server.js files query, don't calculate it in this file! --></td>
+				<td>
+                    <!-- TODO: Display the total number of wins here.
+	                This value should come from your server.js files query, don't calculate it in this file! -->
+
+                    <%
+                    if(gamesWon){
+                        //console.log(gamesWon)%>
+                        <%- gamesWon %>
+                    <%}%>
+
+
+                </td>
+				<td>
+                    <!-- TODO: Display the total number of losses here.
+			        This value should come from your server.js files query, don't calculate it in this file! -->
+
+                    <%
+                    if(gamesLost){
+                        //console.log(gamesLost)%>
+                    <%- gamesLost %>
+                    <%}%>
+
+                </td>
 			</tr>
 		</table>
 		

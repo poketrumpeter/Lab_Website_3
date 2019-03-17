@@ -26,8 +26,8 @@ const dbConfig = {
 	host: 'localhost',
 	port: 5432,
 	database: 'football_db',
-	user: 'postgres',
-	password: 'pwd'
+	user: 'poketrumpeter',
+	password: 'GMan99!!'
 };
 
 var db = pgp(dbConfig);
@@ -95,8 +95,184 @@ app.get('/register', function(req, res) {
 	});
 });
 
+
+
 /*Add your other get/post request handlers below here: */
 
+app.get('/home', function(req, res) {
+    var query = 'select * from favorite_colors;';
+    db.any(query)
+        .then(function (rows) {
+            res.render('pages/home',{
+                my_title: "Home Page",
+                data: rows,
+                color: '',
+                color_msg: ''
+            })
+
+        })
+        .catch(function (err) {
+            // display error message in case an error
+            request.flash('error', err);
+            response.render('pages/home', {
+                title: 'Home Page',
+                data: '',
+                color: '',
+                color_msg: ''
+            })
+        })
+});
+
+
+app.get('/home/pick_color', function(req, res) {
+    var color_choice = req.query.color_selection;
+    var color_options =  'select * from favorite_colors;';
+    var color_message = "select color_msg from favorite_colors where hex_value = '" + color_choice + "';";
+    db.task('get-everything', task => {
+        return task.batch([
+            task.any(color_options),
+            task.any(color_message)
+        ]);
+    })
+        .then(info => {
+            res.render('pages/home',{
+                my_title: "Home Page",
+                data: info[0],
+                color: color_choice,
+                color_msg: info[1][0].color_msg
+            })
+        })
+        .catch(error => {
+            // display error message in case an error
+            request.flash('error', err);
+            response.render('pages/home', {
+                title: 'Home Page',
+                data: '',
+                color: '',
+                color_msg: ''
+            })
+        });
+
+});
+
+
+app.post('/home/pick_color', function(req, res) {
+    var color_hex = req.body.color_hex;
+    var color_name = req.body.color_name;
+    var color_message = req.body.color_message;
+    var insert_statement = "INSERT INTO favorite_colors(hex_value, name, color_msg) VALUES('" + color_hex + "','" +
+        color_name + "','" + color_message +"') ON CONFLICT DO NOTHING;";
+
+    var color_select = 'select * from favorite_colors;';
+    db.task('get-everything', task => {
+        return task.batch([
+            task.any(insert_statement),
+            task.any(color_select)
+        ]);
+    })
+        .then(info => {
+            res.render('pages/home',{
+                my_title: "Home Page",
+                data: info[1],
+                color: color_hex,
+                color_msg: color_message
+            })
+        })
+        .catch(error => {
+            // display error message in case an error
+            request.flash('error', err);
+            response.render('pages/home', {
+                title: 'Home Page',
+                data: '',
+                color: '',
+                color_msg: ''
+            })
+        });
+});
+
+app.get('/team_stats', function (req, res) {
+    var footballGames = 'select * from football_games;';
+    var wins = 'select count(*) from football_games where home_score > visitor_score;';
+    var losses = 'select count(*) from football_games where home_score < visitor_score;';
+    db.task('get-everything', task => {
+        return task.batch([
+            task.any(footballGames),
+            task.any(wins),
+            task.any(losses)
+        ]);
+    })
+    .then(info => {
+        res.render('pages/team_stats' ,{
+            my_title: "Team Stats",
+            data: info[0],
+            gamesWon: info[1][0].count,
+            gamesLost: info[2][0].count
+        })
+    })
+
+        .catch(error => {
+            request.flash('error', err);
+            response.render('pages/team_stats', {
+              title: 'team Stats',
+              data: '',
+              gamesWon: '',
+              gamesLost: ''
+            })
+        })
+
+});
+
+app.get('/player_info', function(req, res){
+    var name_id = 'select id, name from football_players;';
+    db.any(name_id)
+        .then(function (rows) {
+            res.render('pages/player_info', {
+                my_title: "Player Information",
+                data: rows
+            })
+
+
+            
+        })
+});
+
+app.get('/player_info/post', function (req, res) {
+    var player_selection = req.query.player_choice;
+    var name_id = 'select id, name from football_players;';
+    var player_info = 'select * from football_players where id = ' + player_selection + ';';
+    var games_played = 'select count(players) from football_games where' + player_selection + '= any(players);';
+
+    db.task('get-everything', task => {
+        return task.batch([
+            task.any(name_id),
+            task.any(player_info),
+            task.any(games_played)
+        ]);
+    })
+
+        .then(info => {
+            res.render('pages/player_info', {
+                my_title: 'Player Information',
+                player_id_name: info
+                //player_stats: info[1][0],
+                //player_games: info[2][0]
+
+
+            })
+        })
+
+        .catch(error => {
+                //request.flash('error', err);
+            console.log("HELP NOT WORKING");
+                response.render('pages/player_info', {
+                    title: 'Player Information',
+                    player_id_name: '',
+                    player_stats: '',
+                    player_games: ''
+                })
+        })
+
+});
 
 app.listen(3000);
 console.log('3000 is the magic port');
