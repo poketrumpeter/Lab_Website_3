@@ -236,42 +236,35 @@ app.get('/player_info', function(req, res){
         })
 });
 
-app.get('/player_info/post', function (req, res) {
+app.get('/player_info/post', (req, res) => {
     var player_selection = req.query.player_choice;
-    var name_id = 'select id, name from football_players;';
-    var player_info = 'select * from football_players where id = ' + player_selection + ';';
-    var games_played = 'select count(players) from football_games where' + player_selection + '= any(players);';
+    if (player_selection != 'Select Player') {
+        var players_name_id = 'SELECT * FROM football_players';
+        var player_stats = 'SELECT * FROM football_players WHERE id = ' + player_selection + ';';
+        var number_games = 'SELECT COUNT(*) FROM football_games WHERE ' + player_selection + ' = ANY(players);';
 
-    db.task('get-everything', task => {
-        return task.batch([
-            task.any(name_id),
-            task.any(player_info),
-            task.any(games_played)
-        ]);
-    })
-
-        .then(info => {
-            res.render('pages/player_info', {
-                my_title: 'Player Information',
-                player_id_name: info
-                //player_stats: info[1][0],
-                //player_games: info[2][0]
-
-
-            })
-        })
-
-        .catch(error => {
-                //request.flash('error', err);
-            console.log("HELP NOT WORKING");
-                response.render('pages/player_info', {
-                    title: 'Player Information',
-                    player_id_name: '',
-                    player_stats: '',
-                    player_games: ''
+        db.task('get-everything', task => task.batch([
+            task.any(players_name_id),
+            task.any(player_stats),
+            task.any(number_games)
+        ]))
+            .then(info => {
+                info[1][0].games_played = info[2][0].count;
+                res.render('pages/player_info', {
+                    my_title: info[1][0].name,
+                    data: info[0],
+                    player_info: info[1][0]
                 })
-        })
-
+            })
+            .catch(err => {
+                request.flash('error', err);
+                response.render('pages/home', {
+                    my_title: 'Player Information Error',
+                    data: '',
+                    player_info: '',
+                })
+            });
+    }
 });
 
 app.listen(3000);

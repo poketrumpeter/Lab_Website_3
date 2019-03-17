@@ -57,7 +57,7 @@
 
 						<%
 						if (data) {
-						    //console.log(data)
+							//console.log(data)
 							var buttons = '';
 							data.forEach(function(item){
 								buttons += '<button type="submit" name="color_selection" class="btn btn-block" style="background-color:#' + item.hex_value + '" value="' + item.hex_value + '">';
@@ -70,6 +70,7 @@
 							}); %>
 						<%- buttons %>
 						<% } %>
+
 						<!-- TODO: Second EJS Update -->
 				  </form>
 				</div>

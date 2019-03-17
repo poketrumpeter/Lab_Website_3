@@ -6,8 +6,13 @@
 			<div class="col-4">
 				<div class="card">
 				<!-- TODO: Modify the ejs code below, to conditionally set the image_src to be from our chosen player -->
-				  <% 
-				  var image_src = '../resources/img/helmet.jpg';
+				  <%
+                  if (player_info) {
+                      //console.log(player_info)
+                      var image_src = player_info.img_src
+                  } else {
+                      var image_src = '../resources/img/helmet.jpg';
+                  }
 
 				  
 				  %>
@@ -21,7 +26,7 @@
 							 			but will display the player's name-->
 							<%
 							if (data){
-							    console.log(data)
+							    //console.log(data)
                                 var newOptions = '';
                                 data.forEach(function(item){
 							        newOptions += '<option value="' + item.id + '">' + item.name + '</option>'
@@ -29,12 +34,6 @@
 
                             <%- newOptions %>
                             <%}
-                            %>
-
-                            <%
-                            //console.log("Name_ID " + player_id_name)
-                            //console.log("Stats " + player_stats)
-                            //console.log("Games " + player_games)
                             %>
 
 						</select>
@@ -52,27 +51,117 @@
 
 
 							<th>Year</th>
-							<td>	</td>
+							<td>
+                                <%
+                                if (player_info) {
+                                %>
+                                    <%- player_info.year %>
+                                <%
+                                }
+                                %>
+                            </td>
 						</tr>
 						<tr>
 							<th>Major</th>
-							<td>	</td>
+							<td>
+                                <%
+                                if(player_info){
+                                %>
+                                    <%- player_info.major %>
+                                <%
+                                }
+
+
+                                %>
+                            </td>
 						</tr>
 						<tr>
 							<th>Games Played</th>
-							<td>	</td>
+							<td>
+                                <%
+
+                                if(player_info){
+                                %>
+                                    <%- player_info.games_played%>
+                                <%
+                                }
+                                %>
+                            </td>
 						</tr>
 						<tr>
-							<td>Passing Yards: </td>
-							<td>Avg. Passing Yards: </td>
+							<td>Passing Yards:
+                            <%
+
+                            if(player_info){
+                            %>
+                                <%- player_info.passing_yards%>
+                            <%
+                            }
+                            %>
+                            </td>
+							<td>Avg. Passing Yards:
+
+                                <%
+
+                                if(player_info){
+                                    var averagePyards = player_info.passing_yards/player_info.games_played
+                                %>
+
+                                <%- averagePyards%>
+                                <%
+                                }
+                                %>
+                            </td>
 						</tr>
 						<tr>
-							<td>Rushing Yards: </td>
-							<td>Avg. Rushing Yards: </td>
+							<td>Rushing Yards:
+                                <%
+
+                                if(player_info){
+                                %>
+                                    <%- player_info.rushing_yards%>
+                                <%
+                                }
+                                %>
+                            </td>
+							<td>Avg. Rushing Yards:
+
+                                <%
+
+                                if(player_info){
+                                    var averageRyards = player_info.rushing_yards/player_info.games_played
+                                %>
+
+                                    <%- averageRyards%>
+                                <%
+                                }
+                                %>
+
+                            </td>
 						</tr>
 						<tr>
-							<td>Receiving Yards: </td>
-							<td>Avg. Receiving Yards: </td>
+							<td>Receiving Yards:
+                                <%
+
+                                if(player_info){
+                                %>
+                                    <%- player_info.receiving_yards%>
+                                <%
+                                }
+                                %>
+                            </td>
+							<td>Avg. Receiving Yards:
+                                <%
+
+                                if(player_info){
+                                    var averageRECyards = player_info.receiving_yards/player_info.games_played
+                                %>
+
+                                <%- averageRECyards%>
+                                <%
+                                }
+                                %>
+                            </td>
 						</tr>
 					</table>
 				</div>
